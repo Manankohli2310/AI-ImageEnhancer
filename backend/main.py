@@ -6,7 +6,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, JSONResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
-from upscaler import enhance_image
 from upscaler import enhance_image, detect_faces
 
 app = FastAPI(title="PixelMorph Professional AI Engine")

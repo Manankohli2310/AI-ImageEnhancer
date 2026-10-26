@@ -457,3 +457,115 @@ resetBtn.addEventListener('click', () => {
     panY = 0;
     applyZoomPan();
 });
+
+
+
+
+
+
+
+// =========================================================
+// 8. Custom Themed Dropdowns (mirrors native <select>)
+// =========================================================
+function enhanceSelect(select) {
+    const wrap = select.closest('.select-container');
+    if (!wrap || wrap.classList.contains('enhanced')) return;
+    wrap.classList.add('enhanced');
+
+    const chevron = `<svg class="custom-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+    const tick = `<svg class="opt-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+    const custom = document.createElement('div');
+    custom.className = 'custom-select';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'custom-select-trigger';
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.innerHTML = `<span class="custom-select-label"></span>${chevron}`;
+    const label = trigger.querySelector('.custom-select-label');
+
+    const menu = document.createElement('div');
+    menu.className = 'custom-select-menu';
+    menu.setAttribute('role', 'listbox');
+
+    const items = Array.from(select.options).map(opt => {
+        const el = document.createElement('div');
+        el.className = 'custom-option';
+        el.setAttribute('role', 'option');
+        el.dataset.value = opt.value;
+        el.innerHTML = `<span>${opt.textContent}</span>${tick}`;
+        el.addEventListener('click', () => choose(opt.value));
+        menu.appendChild(el);
+        return el;
+    });
+
+    let focusIdx = -1;
+
+    function sync() {
+        items.forEach((el, i) => {
+            const isSel = el.dataset.value === select.value;
+            el.classList.toggle('selected', isSel);
+            if (isSel) {
+                label.textContent = select.options[i].textContent;
+                focusIdx = i;
+            }
+        });
+    }
+
+    function setFocus(i) {
+        focusIdx = (i + items.length) % items.length;
+        items.forEach((el, n) => el.classList.toggle('focused', n === focusIdx));
+        items[focusIdx].scrollIntoView({ block: 'nearest' });
+    }
+
+    function open() {
+        document.querySelectorAll('.custom-select.open').forEach(s => s.classList.remove('open'));
+        custom.classList.add('open');
+        setFocus(Math.max(focusIdx, 0));
+    }
+
+    function close() {
+        custom.classList.remove('open');
+        items.forEach(el => el.classList.remove('focused'));
+    }
+
+    function choose(value) {
+        select.value = value;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        sync();
+        close();
+        trigger.focus();
+    }
+
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        custom.classList.contains('open') ? close() : open();
+    });
+
+    trigger.addEventListener('keydown', (e) => {
+        const isOpen = custom.classList.contains('open');
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (!isOpen) return open();
+            setFocus(focusIdx + (e.key === 'ArrowDown' ? 1 : -1));
+        } else if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (!isOpen) open();
+            else choose(items[focusIdx].dataset.value);
+        } else if (e.key === 'Escape') {
+            close();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!custom.contains(e.target)) close();
+    });
+
+    custom.appendChild(trigger);
+    custom.appendChild(menu);
+    wrap.appendChild(custom);
+    sync();
+}
+
+document.querySelectorAll('.select-container select').forEach(enhanceSelect);

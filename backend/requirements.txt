@@ -1,8 +1,8 @@
+gradio
+spaces
 torch
 torchvision
 numpy
-pillow
+Pillow
 spandrel
-fastapi
-uvicorn[standard]
-python-multipart
+opencv-python-headless

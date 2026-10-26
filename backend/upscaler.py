@@ -9,8 +9,13 @@ from io import BytesIO
 from spandrel import ModelLoader
 
 # Allocate all CPU threads for PyTorch operations
+
+import torch
+print(torch.__version__)          # e.g. 2.4.0+cpu  or  2.4.0+cu121
+print(torch.cuda.is_available())
 torch.set_num_threads(os.cpu_count() or 4)
-DEVICE = torch.device("cpu")
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"[AI] Using device: {DEVICE}")
 
 WEIGHTS_DIR = os.path.join(os.path.dirname(__file__), "weights")
 

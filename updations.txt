@@ -1,0 +1,7 @@
+first of all check all parameters in enhancer as it rotates the images sometime, the quality is not that great now, it is taking alot of time to process a single image, their is no reliable deployment method for free so find a best suitable method for it
+
+second separate this enhancer and pixel morph app and post them differently on github 
+
+check all parameters of pixelmorph as well to identify bugs if any are their 
+
+I need your apps ready in december ending fully hosted for public use as well 
